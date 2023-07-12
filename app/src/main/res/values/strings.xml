@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">FitMatrix_v1</string>
+    <string name="reps">Reps</string>
+    <string name="kg">kg</string>
+    <string name="set_1">Set 1</string>
+    <string name="log">Log</string>
+    <string name="start_new">Start New</string>
+    <string name="settings_page">Settings Page</string>
+    <string name="reset_everything">Reset Everything</string>
+    <string-array name="workout_options">
+        <item>Bench Press</item>
+        <item>Squats</item>
+        <item>Deadlifts</item>
+    </string-array>
+
+</resources>

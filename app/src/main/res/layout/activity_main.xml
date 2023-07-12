@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#BDD99E">
+
+    <!-- App Bar -->
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appBarLayout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:menu="@menu/menu_main"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:title="Fit Matrix" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+
+    <AutoCompleteTextView
+        android:id="@+id/et_search_workout"
+        android:layout_width="320dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="35dp"
+        android:completionThreshold="1"
+        android:gravity="center_horizontal"
+        android:hint="Enter exercise name"
+        android:textColorHint="#4F000000"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/appBarLayout" />
+
+    <EditText
+        android:id="@+id/et_weight"
+        android:layout_width="141dp"
+        android:layout_height="53dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="34dp"
+        android:hint="Weight"
+        android:inputType="numberDecimal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_search_workout" />
+
+    <Switch
+        android:id="@+id/switch_unit"
+        android:layout_width="141dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="37dp"
+        android:layout_marginTop="34dp"
+        android:layout_marginEnd="73dp"
+        android:text="@string/kg"
+        android:textAlignment="textEnd"
+        android:textAllCaps="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/et_weight"
+        app:layout_constraintTop_toBottomOf="@+id/et_search_workout"
+        tools:ignore="UseSwitchCompatOrMaterialXml" />
+
+    <EditText
+        android:id="@+id/et_reps"
+        android:layout_width="140dp"
+        android:layout_height="48dp"
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="18dp"
+        android:layout_marginBottom="11dp"
+        android:hint="@string/reps"
+        android:inputType="number"
+        app:layout_constraintBottom_toTopOf="@+id/rv_past_sets"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_weight" />
+
+    <Button
+        android:id="@+id/btn_log_workout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="129dp"
+        android:layout_marginEnd="17dp"
+        android:backgroundTint="#2E8B57"
+        android:text="@string/log"
+        android:textColor="#FAFAFA"
+        app:cornerRadius="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rv_past_sets" />
+
+    <Button
+        android:id="@+id/btn_start_new"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="78dp"
+        android:layout_marginTop="221dp"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="13dp"
+        android:backgroundTint="#2E8B57"
+        android:text="@string/start_new"
+        android:textColor="#FAFAFA"
+        app:cornerRadius="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_edit"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/tv_set_number_on_edit"
+        app:layout_constraintTop_toBottomOf="@+id/switch_unit"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_past_sets"
+        android:layout_width="376dp"
+        android:layout_height="144dp"
+        android:layout_marginStart="18dp"
+        android:layout_marginTop="68dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_unit"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/tv_current_set"
+        android:layout_width="148dp"
+        android:layout_height="68dp"
+        android:layout_marginStart="53dp"
+        android:layout_marginTop="244dp"
+        android:gravity="center_horizontal"
+        android:text="@string/set_1"
+        android:textSize="45sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_log_workout"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_unit" />
+
+    <TextView
+        android:id="@+id/tv_set_number_on_edit"
+        android:layout_width="180dp"
+        android:layout_height="66dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="244dp"
+        android:gravity="center_horizontal"
+        android:text="Set 1"
+        android:textColor="#D5454A"
+        android:textSize="45sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_edit"
+        app:layout_constraintHorizontal_bias="0.271"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/switch_unit" />
+
+    <Button
+        android:id="@+id/btn_edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="17dp"
+        android:layout_marginBottom="11dp"
+        android:backgroundTint="#2E8B57"
+        android:clickable="false"
+        android:text="Update"
+        android:textColor="#FFFFFF"
+        app:cornerRadius="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/btn_log_workout"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_setStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="92dp"
+        android:layout_marginTop="4dp"
+        android:text="current set"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_current_set" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <!-- Visible Options -->
+    <item
+        android:id="@+id/menu_progress"
+        android:title="Progress"
+        android:icon="@drawable/progress_black"
+        android:onClick="learnPage"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_calendar"
+        android:title="Calendar"
+        android:icon="@drawable/calendar_black"
+        android:onClick="calendarPage"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/menu_profile"
+        android:title="Profile"
+        android:icon="@drawable/user_black"
+        android:onClick="profilePage"
+        app:showAsAction="always" />
+
+    <!-- Hidden Option -->
+    <item
+        android:id="@+id/menu_settings"
+        android:title="Settings"
+        android:icon="@drawable/ic_launcher_foreground"
+        android:onClick="settingsPage"
+        app:showAsAction="never" />
+</menu>
