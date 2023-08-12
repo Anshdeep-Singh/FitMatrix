@@ -12,7 +12,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="24dp"
-        android:text="Login Page"
+        android:text="Login"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -37,5 +37,19 @@
         android:layout_height="wrap_content"
         android:backgroundTint="#2E8B57"
         android:text="Login" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="OR"
+        android:textStyle="bold" />
+
+    <Button
+        android:id="@+id/btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register" />
 
 </LinearLayout>

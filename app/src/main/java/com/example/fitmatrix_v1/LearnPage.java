@@ -2,15 +2,11 @@ package com.example.fitmatrix_v1;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
-import android.graphics.Movie;
-import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,8 +19,10 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.HttpResponse;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.fitmatrix_v1.RecyclerViewOperator.ChecklistAdapter;
 import com.example.fitmatrix_v1.RecyclerViewOperator.ExerciseRecyclerAdapter;
 import com.example.fitmatrix_v1.RecyclerViewOperator.RecyclerAdapter;
 
@@ -32,6 +30,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +60,8 @@ public class LearnPage extends AppCompatActivity {
         muscleAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         muscleSpinner.setAdapter(muscleAdapter);
 
+
+
         muscleSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -76,6 +77,7 @@ public class LearnPage extends AppCompatActivity {
         });
 
     }
+
 
     public void fetchExercises(String selectedMuscle){
 
@@ -118,6 +120,8 @@ public class LearnPage extends AppCompatActivity {
 
         requestQueue.add(jsonArrayRequest);
     };
+
+
 
     public void goToHome(View view) {
         Intent intent = new Intent(this, MainActivity.class);

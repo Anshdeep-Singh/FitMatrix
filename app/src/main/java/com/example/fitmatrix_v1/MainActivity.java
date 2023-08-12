@@ -4,6 +4,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -12,12 +14,27 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.fitmatrix_v1.DatabaseOperator.DatabaseHelper;
 import com.example.fitmatrix_v1.DatabaseOperator.ExerciseDetails;
+import com.example.fitmatrix_v1.RecyclerViewOperator.ChecklistAdapter;
 import com.example.fitmatrix_v1.RecyclerViewOperator.RecyclerAdapter;
 import com.example.fitmatrix_v1.databinding.ActivityMainBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -27,14 +44,24 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements RecyclerAdapter.OnItemClickListener  {
 
     private ActivityMainBinding binding;
+
+    private RecyclerView recyclerView;
+    private ChecklistAdapter checklistAdapter;
     private String exerciseName;
     private String unit;
     private float weight;
     private Integer reps;
+
+    private boolean flag = true;
     private DatabaseHelper databaseHelper;
+    private RequestQueue requestQueue;
+
     private RecyclerAdapter adapter;
     private List<ExerciseDetails> exerciseList;
     private ExerciseDetails exercise;
+
+    private List<String> workoutList = new ArrayList<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +74,8 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.O
         String[] listExercise = ExerciseDetails.getListExercise();
         exerciseList = new ArrayList<>();
         databaseHelper = new DatabaseHelper(this);
+        requestQueue = VolleySingleton.getInstance(this).getRequestQueue();
+        FloatingActionButton fab_workoutPlan = findViewById(R.id.fab_workoutPlan);
 
         ArrayAdapter<String> auto_complete_adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, listExercise);
         Switch switch_unit = findViewById(R.id.switch_unit);
@@ -128,6 +157,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.O
                 binding.etSearchWorkout.setText("");
                 binding.etWeight.setText("");
                 binding.etReps.setText("");
+            }
+        });
+
+        fab_workoutPlan.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                createWorkoutPlan();
             }
         });
     }
@@ -226,4 +262,77 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.O
         Intent i = new Intent(this,CalendarPage.class);
         startActivity(i);
     }
+
+
+    private void createWorkoutPlan(){
+        String url = "https://workout-api.vercel.app/api/random";
+
+        if(flag){
+            flag =false;
+            JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null, response -> {
+                try {
+                    workoutList = new ArrayList<>();
+                    for (int i = 0; i < response.length(); i++) {
+                        String workoutName = response.getString(i);
+                        workoutList.add(workoutName);
+                    }
+
+                    // Inflate the layout containing the ListView
+                    View layoutView = getLayoutInflater().inflate(R.layout.popup_workout_checklist, null);
+                    ListView listView = layoutView.findViewById(R.id.plan_listView); // Replace with the correct ID
+                    listView.setAdapter(new ChecklistAdapter(MainActivity.this, android.R.layout.simple_list_item_1, workoutList));
+
+                    Log.d("--->", "Got data from API");
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Today's Workout Challenge")
+                            .setAdapter(new ChecklistAdapter(this, android.R.layout.simple_list_item_multiple_choice, workoutList),
+                                    new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialogInterface, int i) {
+                                            // Handle item click here
+                                        }
+                                    })
+                            .setPositiveButton("Done", null);
+
+                    AlertDialog dialog = builder.create();
+                    ListView listView1 = dialog.getListView();
+                    listView1.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+                    dialog.show();
+
+                } catch (JSONException e) {
+                    Log.d("--->", "Failed data from API");
+                    e.printStackTrace();
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("--->", "Failed data from API" + error.getMessage());
+                    Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            requestQueue.add(jsonArrayRequest);
+
+        }
+        else{
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Select Workouts")
+                    .setAdapter(new ChecklistAdapter(this, android.R.layout.simple_list_item_multiple_choice, workoutList),
+                            new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // Handle item click here
+                                }
+                            })
+                    .setPositiveButton("Done", null);
+
+            AlertDialog dialog = builder.create();
+            ListView listView1 = dialog.getListView();
+            listView1.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+            dialog.show();
+        }
+    }
+
+
 }

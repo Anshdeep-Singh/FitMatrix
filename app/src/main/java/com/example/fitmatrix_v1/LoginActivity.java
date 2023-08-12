@@ -41,6 +41,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             showRegistrationPopup();
         }
+
     }
 
     private void showLoginView() {
@@ -49,6 +50,15 @@ public class LoginActivity extends AppCompatActivity {
         usernameEditText = findViewById(R.id.usernameEditText);
         passwordEditText = findViewById(R.id.passwordEditText);
         Button loginButton = findViewById(R.id.loginButton);
+        Button registerButton = findViewById(R.id.btn_register);
+
+        registerButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRegistrationPopup();
+            }
+        });
+
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
