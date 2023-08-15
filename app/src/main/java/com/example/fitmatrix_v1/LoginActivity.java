@@ -1,42 +1,53 @@
 package com.example.fitmatrix_v1;
 
-import android.content.ContentValues;
+import static android.content.ContentValues.TAG;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import androidx.annotation.NonNull;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.fitmatrix_v1.DatabaseOperator.DatabaseContract;
-import com.example.fitmatrix_v1.DatabaseOperator.UserDatabaseHelper;
+import java.util.HashMap;
+import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
     private EditText usernameEditText, passwordEditText;
-    private UserDatabaseHelper dbHelper;
+    private ProgressBar progressBar;
+
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore mFirestore;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_login);
 
-        dbHelper = new UserDatabaseHelper(this);
-//        dbHelper.onUpgrade(dbHelper.getWritableDatabase(), 1, 2);
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + DatabaseContract.UserEntry.TABLE_NAME, null);
-        boolean userExists = cursor.moveToFirst();
-        cursor.close();
-        db.close();
+        mAuth = FirebaseAuth.getInstance();
+        progressBar = findViewById(R.id.progressBar);
+        mFirestore = FirebaseFirestore.getInstance();
 
-        if (userExists) {
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
             showLoginView();
         } else {
             showRegistrationPopup();
@@ -44,11 +55,22 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            startActivity(new Intent(getApplicationContext(), MainActivity.class));
+            finish();
+        }
+    }
+
     private void showLoginView() {
 
         setContentView(R.layout.activity_login);
         usernameEditText = findViewById(R.id.usernameEditText);
-        passwordEditText = findViewById(R.id.passwordEditText);
+        passwordEditText = findViewById(R.id.passwordEditTextR);
         Button loginButton = findViewById(R.id.loginButton);
         Button registerButton = findViewById(R.id.btn_register);
 
@@ -62,33 +84,45 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = usernameEditText.getText().toString();
+                progressBar.setVisibility(View.VISIBLE);
+                String email = usernameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                if (validateCredentials(username, password)) {
-                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                    finish();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_SHORT).show();
+
+                if (email.isEmpty()) {
+                    usernameEditText.setError("Please enter your email");
+                    usernameEditText.requestFocus();
+                    return;
                 }
+                if (password.isEmpty()) {
+                    passwordEditText.setError("Please enter your password");
+                    passwordEditText.requestFocus();
+                    return;
+                } else {
+                    mAuth.signInWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        progressBar.setVisibility(View.GONE);
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Log.d(TAG, "signInWithEmail:success");
+                                        startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                                        finish();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w(TAG, "signInWithEmail:failure", task.getException());
+                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                        startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+                                    }
+                                }
+                            });
+                }
+
             }
         });
     }
 
-    private boolean validateCredentials(String username, String password) {
-        SQLiteDatabase db = dbHelper.getReadableDatabase();
-        String[] projection = {
-                DatabaseContract.UserEntry.COLUMN_USERNAME
-        };
-        String selection = DatabaseContract.UserEntry.COLUMN_USERNAME + " = ? AND " +
-                DatabaseContract.UserEntry.COLUMN_PASSWORD + " = ?";
-        String[] selectionArgs = {username, password};
-        Cursor cursor = db.query(
-                DatabaseContract.UserEntry.TABLE_NAME, projection, selection, selectionArgs, null, null, null);
-        boolean isValid = cursor.getCount() > 0;
-        cursor.close();
-        db.close();
-        return isValid;
-    }
 
     private void showRegistrationPopup() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -99,71 +133,70 @@ public class LoginActivity extends AppCompatActivity {
         builder.setView(dialogView);
 
         final EditText nameEditText = dialogView.findViewById(R.id.nameEditText);
-        final EditText passwordEditText = dialogView.findViewById(R.id.passwordEditText);
-        final EditText ageEditText = dialogView.findViewById(R.id.ageEditText);
-        final EditText weightEditText = dialogView.findViewById(R.id.weightEditText);
-        final EditText heightEditText = dialogView.findViewById(R.id.heightEditText);
+        final EditText passwordEditText = dialogView.findViewById(R.id.passwordEditTextR);
+        final EditText emailEditText = dialogView.findViewById(R.id.emailEditTextR);
 
         builder.setPositiveButton("Register", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-
+                progressBar.setVisibility(View.VISIBLE);
                 String name = nameEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                String ageString = ageEditText.getText().toString();
-                String weightString = weightEditText.getText().toString();
-                String heightString = heightEditText.getText().toString();
+                String email = emailEditText.getText().toString();
 
-                if (isRegistrationInputValid(name, password, ageString, weightString, heightString)) {
-                    int age = Integer.parseInt(ageString);
-                    int weight = Integer.parseInt(weightString);
-                    int height = Integer.parseInt(heightString);
-
-                    SQLiteDatabase db = dbHelper.getWritableDatabase();
-                    ContentValues values = new ContentValues();
-                    values.put(DatabaseContract.UserEntry.COLUMN_USERNAME, name);
-                    values.put(DatabaseContract.UserEntry.COLUMN_PASSWORD, password);
-                    values.put(DatabaseContract.UserEntry.COLUMN_AGE, age);
-                    values.put(DatabaseContract.UserEntry.COLUMN_WEIGHT, weight);
-                    values.put(DatabaseContract.UserEntry.COLUMN_HEIGHT, height);
-                    db.insert(DatabaseContract.UserEntry.TABLE_NAME, null, values);
-                    db.close();
-
-                    showLoginView();
-                } else {
-                    Toast.makeText(LoginActivity.this, "Invalid registration input", Toast.LENGTH_SHORT).show();
-                    showRegistrationPopup();
+                if (email.isEmpty()) {
+                    emailEditText.setError("Please enter your email");
+                    emailEditText.requestFocus();
+                    return;
                 }
+                if (password.isEmpty()) {
+                    passwordEditText.setError("Please enter your password");
+                    passwordEditText.requestFocus();
+                    return;
+                } else {
+                    mAuth.createUserWithEmailAndPassword(email, password)
+                            .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                                @Override
+                                public void onComplete(@NonNull Task<AuthResult> task) {
+                                    if (task.isSuccessful()) {
+                                        progressBar.setVisibility(View.GONE);
+                                        // Sign in success, update UI with the signed-in user's information
+                                        Log.d(TAG, "createUserWithEmail:success");
+                                        showLoginView();
+                                    } else {
+                                        // If sign in fails, display a message to the user.
+                                        Log.w(TAG, "createUserWithEmail:failure", task.getException());
+                                        Toast.makeText(LoginActivity.this, "Authentication failed.",
+                                                Toast.LENGTH_SHORT).show();
+                                        showLoginView();
+                                    }
+                                }
+                            });
+
+                    Map<String, Object> userDetails = new HashMap<>();
+                    userDetails.put("name", name);
+                    userDetails.put("email", email);
+                    userDetails.put("imageProfile"," ");
+
+                    mFirestore.collection("users").document(email)
+                            .set(userDetails, SetOptions.merge())
+                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    Log.d(TAG, "User details added to database");
+                                }
+                            });
+
+                }
+
+            }
+        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+        showLoginView();
             }
         });
-
         AlertDialog dialog = builder.create();
         dialog.show();
-    }
-
-    private boolean isRegistrationInputValid(String name, String password, String ageString, String weightString, String heightString) {
-        if (name.isEmpty() || password.isEmpty() || ageString.isEmpty() || weightString.isEmpty() || heightString.isEmpty()) {
-            return false;
-        }
-
-        try {
-            int age = Integer.parseInt(ageString);
-            if (age <= 0 || age > 80) {
-                return false;
-            }
-            double weight = Double.parseDouble(weightString);
-            if (weight <= 0 || weight > 600) {
-                return false;
-            }
-
-            double height = Double.parseDouble(heightString);
-            if (height <= 0 || height > 300) {
-                return false;
-            }
-        } catch (NumberFormatException e) {
-            return false;
-        }
-
-        return true;
     }
 }

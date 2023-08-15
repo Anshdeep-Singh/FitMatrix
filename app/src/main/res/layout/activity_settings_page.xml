@@ -59,17 +59,9 @@
         android:layout_marginBottom="36dp"
         android:backgroundTint="#95CC6D"
         android:text="Logout"
+        android:textColor="#000000"
         app:layout_constraintBottom_toTopOf="@+id/btn_reset_database"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
-        android:id="@+id/btn_edit_details"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="65dp"
-        android:text="Edit User Details"
-        app:layout_constraintBottom_toTopOf="@+id/btn_logout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
