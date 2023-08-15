@@ -6,6 +6,8 @@ import android.os.Handler;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.FirebaseApp;
+
 public class SplashScreenActivity extends AppCompatActivity {
 
     private static final int SPLASH_DURATION = 2000; // 2 seconds start screen
@@ -13,6 +15,8 @@ public class SplashScreenActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FirebaseApp.initializeApp(this);
+
         setContentView(R.layout.activity_logo);
 
         new Handler().postDelayed(new Runnable() {

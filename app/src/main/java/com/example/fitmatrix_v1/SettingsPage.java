@@ -14,14 +14,14 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.fitmatrix_v1.DatabaseOperator.DatabaseContract;
 import com.example.fitmatrix_v1.DatabaseOperator.DatabaseHelper;
-import com.example.fitmatrix_v1.DatabaseOperator.UserDatabaseHelper;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class SettingsPage extends AppCompatActivity {
 
     private DatabaseHelper databaseHelper;
-    private UserDatabaseHelper userDatabaseHelper;
+    private FirebaseAuth mAuth;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,52 +29,12 @@ public class SettingsPage extends AppCompatActivity {
         setContentView(R.layout.activity_settings_page);
 
         Button logout_button = findViewById(R.id.btn_logout);
-        Button edit_details = findViewById(R.id.btn_edit_details);
-
-        edit_details.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(SettingsPage.this);
-                builder.setTitle("Edit Details");
-                LayoutInflater inflater = getLayoutInflater();
-                View dialogView = inflater.inflate(R.layout.popup_edit_details, null);
-                builder.setView(dialogView);
-                final EditText ageEditText = dialogView.findViewById(R.id.et_edit_age);
-                final EditText weightEditText = dialogView.findViewById(R.id.et_edit_weight);
-                final EditText heightEditText = dialogView.findViewById(R.id.et_edit_height);
-
-
-                builder.setPositiveButton("Save", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        String ageString = ageEditText.getText().toString();
-                        String weightString = weightEditText.getText().toString();
-                        String heightString = heightEditText.getText().toString();
-
-                        if (isRegistrationInputValid(ageString, weightString, heightString)) {
-                            int age = Integer.parseInt(ageString);
-                            int weight = Integer.parseInt(weightString);
-                            int height = Integer.parseInt(heightString);
-
-                            userDatabaseHelper = new UserDatabaseHelper(SettingsPage.this);
-                            ContentValues values = new ContentValues();
-
-                            userDatabaseHelper.updateUserDetails(userDatabaseHelper.getUserId(userDatabaseHelper.getUser()),age,weight,height);
-
-                        } else {
-                            Toast.makeText(SettingsPage.this, "Invalid details.", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-                AlertDialog dialog = builder.create();
-                dialog.show();
-            }
-        });
 
         logout_button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mAuth = FirebaseAuth.getInstance();
+                mAuth.signOut();
                 Intent intent = new Intent(SettingsPage.this, LoginActivity.class);
                 startActivity(intent);
             }
@@ -87,12 +47,6 @@ public class SettingsPage extends AppCompatActivity {
         final SQLiteDatabase db = databaseHelper.getWritableDatabase();
         databaseHelper.onUpgrade(db,1,2);
         db.close();
-
-        userDatabaseHelper = new UserDatabaseHelper(this);
-        final SQLiteDatabase db2 = userDatabaseHelper.getWritableDatabase();
-        userDatabaseHelper.onUpgrade(db2,1,2);
-        db2.close();
-
         Intent intent = new Intent(this, SplashScreenActivity.class);
         startActivity(intent);
     }
@@ -129,8 +83,4 @@ public class SettingsPage extends AppCompatActivity {
         return true;
     }
 
-    // reset database [done]
-    // import database
-    // export database
-    // logout [done]
 }

@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "583394619551",
+    "project_id": "fitmatrix-4f892",
+    "storage_bucket": "fitmatrix-4f892.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:583394619551:android:4a02a40bb41030c007f2aa",
+        "android_client_info": {
+          "package_name": "com.example.fitmatrix_v1"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "583394619551-kdghr7f4pcafpng38ov86tk8okrhm82b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa8pf48PZbNjt2dBrDN1K4cBCCBFXDi8g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "583394619551-kdghr7f4pcafpng38ov86tk8okrhm82b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
