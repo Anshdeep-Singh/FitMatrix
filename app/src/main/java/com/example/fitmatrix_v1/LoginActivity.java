@@ -98,6 +98,7 @@ public class LoginActivity extends AppCompatActivity {
                     passwordEditText.requestFocus();
                     return;
                 } else {
+
                     mAuth.signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                                 @Override

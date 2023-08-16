@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.fitmatrix_v1.DatabaseOperator.DatabaseHelper;
 import com.example.fitmatrix_v1.DatabaseOperator.ExerciseDetails;
 import com.example.fitmatrix_v1.RecyclerViewOperator.WorkoutAdapter;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -32,6 +34,7 @@ public class CalendarPage extends AppCompatActivity {
     private DatabaseHelper databaseHelper;
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,6 +44,7 @@ public class CalendarPage extends AppCompatActivity {
 
         calendarView = findViewById(R.id.calendarView);
         workoutRecyclerView = findViewById(R.id.workoutRecyclerView);
+
 
         TextView recyclerPlaceholder = findViewById(R.id.tv_placeholderSelectDate);
 
@@ -70,6 +74,7 @@ public class CalendarPage extends AppCompatActivity {
 
         Log.d("---->",selectedDate);
         List<ExerciseDetails> allData = databaseHelper.getAllData();
+
         int total_sets = 0;
         int total_reps = 0;
         int total_weight = 0;

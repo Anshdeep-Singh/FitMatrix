@@ -1,5 +1,8 @@
 package com.example.fitmatrix_v1;
 
+import static android.content.ContentValues.TAG;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +32,13 @@ import com.example.fitmatrix_v1.DatabaseOperator.ExerciseDetails;
 import com.example.fitmatrix_v1.RecyclerViewOperator.ChecklistAdapter;
 import com.example.fitmatrix_v1.RecyclerViewOperator.RecyclerAdapter;
 import com.example.fitmatrix_v1.databinding.ActivityMainBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.SetOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -44,6 +53,10 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements RecyclerAdapter.OnItemClickListener  {
 
     private ActivityMainBinding binding;
+
+    private FirebaseFirestore mFirestore;
+    private FirebaseUser currentUser;
+    private FirebaseAuth mAuth;
 
     private RecyclerView recyclerView;
     private ChecklistAdapter checklistAdapter;
@@ -73,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.O
 
         String[] listExercise = ExerciseDetails.getListExercise();
         exerciseList = new ArrayList<>();
+        mFirestore = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        currentUser = mAuth.getCurrentUser();
         databaseHelper = new DatabaseHelper(this);
         requestQueue = VolleySingleton.getInstance(this).getRequestQueue();
         FloatingActionButton fab_workoutPlan = findViewById(R.id.fab_workoutPlan);
@@ -134,6 +150,13 @@ public class MainActivity extends AppCompatActivity implements RecyclerAdapter.O
 
                 databaseHelper.insertData(currentDate+set_no,exerciseName,weight,set_no,reps,unit);
                 exercise = new ExerciseDetails(currentDate+set_no,exerciseName,weight,set_no,reps,unit);
+                mFirestore.collection(currentUser.getEmail()).document(currentDate+set_no).set(exercise, SetOptions.merge()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this, "Data Updated to Database", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
                 exerciseList.add(exercise);
 
                 set_no +=1;
